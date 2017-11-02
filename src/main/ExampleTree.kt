@@ -2,22 +2,22 @@ package main
 
 class ExampleTree<K : Comparable<K>, V> {
 
-    private var root: Vertex<K, V>? = null
+    private var root: Node<K, V>? = null
 
-    inner private class Vertex<T : Comparable<T>, U>(val key: T, var value: U) {
-        var left: Vertex<T, U>? = null
-        var right: Vertex<T, U>? = null
+    inner private class Node<T : Comparable<T>, U>(val key: T, var value: U) {
+        var left: Node<T, U>? = null
+        var right: Node<T, U>? = null
     }
 
-    private fun <K : Comparable<K>, V> search(key: K, vertex: Vertex<K, V>?): V? {
-        return if (vertex == null || key == vertex.key) {
-            vertex?.value
+    private fun <K : Comparable<K>, V> search(key: K, node: Node<K, V>?): Node<K, V>? {
+        return if (node == null || key == node.key) {
+            node
         }
-        else if (key <= vertex.key) {
-            search(key, vertex.left)
+        else if (key <= node.key) {
+            search(key, node.left)
         }
-        else if (key >= vertex.key) {
-            search(key, vertex.right)
+        else if (key >= node.key) {
+            search(key, node.right)
         }
         else {
             null
@@ -25,44 +25,76 @@ class ExampleTree<K : Comparable<K>, V> {
     }
 
     fun get(key: K): V? {
-        return search(key, root)
+        return search(key, root)?.value
     }
 
-    private fun put(key: K, value: V, vertex: Vertex<K, V>): V?{
-        if (key < vertex.key) {
-            return if (vertex.left == null){
-                vertex.left = Vertex(key, value)
+    private fun put(key: K, value: V, node: Node<K, V>): V?{
+        when {
+            key < node.key -> return if (node.left == null){
+                node.left = Node(key, value)
                 null
             } else {
-                put(key, value, vertex.left!!)
+                put(key, value, node.left!!)
             }
-        }
-        else if (key > vertex.key) {
-            return if (vertex.right == null){
-                vertex.right = Vertex(key, value)
+            key > node.key -> return if (node.right == null){
+                node.right = Node(key, value)
                 null
             } else {
-                put(key, value, vertex.right!!)
+                put(key, value, node.right!!)
             }
-        }
-        else{
-            val lastValue = vertex.value
-            vertex.value = value
-            return lastValue
+            else -> {
+                val lastValue = node.value
+                node.value = value
+                return lastValue
+            }
         }
     }
 
     fun put(key: K, value: V): V?{
-        if (isEmpty()){
-            root = Vertex(key, value)
-            return null
+        return if (root == null){
+            root = Node(key, value)
+            null
         }
         else{
             put(key, value, root!!)
         }
     }
 
-    fun isEmpty(): Boolean{
-        return root == null
+    private fun remove(key: K, vertex: Node<K, V>?): V?{
+
+    }
+
+    fun remove(key: K): V?{
+        if (root == null){
+            return null
+        }
+        else if (key < root!!.key){
+            return remove(key, root!!.left)
+        }
+        else if (key > root!!.key){
+            return remove(key, root!!.right)
+        }
+        else if (root!!.key == key ){
+            if (root!!.left == null && root!!.right == null){
+                val lastValue = root!!.value
+                root = null
+                return lastValue
+            }
+            else if (root!!.left == null){
+                val lastValue = root!!.value
+                root = root!!.right
+                return lastValue
+            }
+            else if (root!!.right == null){
+                val lastValue = root!!.value
+                root = root!!.left
+                return lastValue
+            }
+            else{
+                if (root!!.right!!.left == null){
+
+                }
+            }
+        }
     }
 }
